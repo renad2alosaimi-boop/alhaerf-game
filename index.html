@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لعبة حرف انسان حيوان</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Tajawal', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
+
+  <div class="w-full max-w-2xl bg-slate-800 rounded-2xl shadow-2xl p-6 border border-slate-700">
+    
+    <!-- 1. شاشة الدخول / الانضمام -->
+    <div id="authScreen" class="space-y-6">
+      <div class="text-center space-y-2">
+        <h1 class="text-4xl font-black text-indigo-400">حرف إنسان حيوان 📝</h1>
+        <p class="text-slate-400">لعبة التحدي والسرعة الجماعية أونلاين</p>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-bold text-slate-300 mb-1">اسمك في اللعبة</label>
+          <input id="playerNameInput" type="text" placeholder="أدخل اسمك هنا..." class="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          <button id="createRoomBtn" class="bg-indigo-600 hover:bg-indigo-500 font-bold py-3 px-4 rounded-xl shadow-lg transition">
+            إنشاء غرفة جديدة ➕
+          </button>
+          
+          <div class="flex gap-2">
+            <input id="roomIdInput" type="text" placeholder="رمز الغرفة" class="w-1/2 bg-slate-700 border border-slate-600 rounded-xl px-3 text-center uppercase text-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <button id="joinRoomBtn" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 font-bold py-3 px-4 rounded-xl shadow-lg transition">
+              انضمام 🚪
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. شاشة الانتظار (Lobby) -->
+    <div id="lobbyScreen" class="hidden space-y-6">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-4">
+        <div>
+          <h2 class="text-xl font-bold">غرفة الانتظار</h2>
+          <p class="text-sm text-slate-400">كود الغرفة: <span id="displayRoomId" class="font-mono text-indigo-400 font-bold select-all"></span></p>
+        </div>
+        <span id="playerCount" class="bg-slate-700 px-3 py-1 rounded-full text-sm">0 لاعبين</span>
+      </div>
+
+      <div>
+        <h3 class="font-bold mb-3 text-slate-300">اللاعبون المتواجدون:</h3>
+        <ul id="playersList" class="grid grid-cols-2 gap-3"></ul>
+      </div>
+
+      <button id="startGameBtn" class="hidden w-full bg-indigo-600 hover:bg-indigo-500 font-black py-4 rounded-xl text-lg shadow-lg transition">
+        إبدأ الجولة الآن 🚀
+      </button>
+    </div>
+
+    <!-- 3. شاشة اللعب (Gameplay) -->
+    <div id="gameScreen" class="hidden space-y-6">
+      <div class="flex justify-between items-center bg-slate-700/50 p-4 rounded-xl border border-slate-600">
+        <div class="text-center">
+          <span class="block text-xs text-slate-400">الحرف المطلوب</span>
+          <span id="currentLetter" class="text-4xl font-black text-amber-400">؟</span>
+        </div>
+        <div class="text-center">
+          <span class="block text-xs text-slate-400">الفيوز / الوقت</span>
+          <span id="timer" class="text-3xl font-mono font-bold text-red-400">60</span>
+        </div>
+      </div>
+
+      <form id="gameForm" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">إنسان</label>
+          <input type="text" id="ans_human" class="game-input w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">حيوان</label>
+          <input type="text" id="ans_animal" class="game-input w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">نبات</label>
+          <input type="text" id="ans_plant" class="game-input w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">جماد</label>
+          <input type="text" id="ans_object" class="game-input w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">بلاد</label>
+          <input type="text" id="ans_country" class="game-input w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <button type="button" id="stopBtn" class="w-full bg-red-600 hover:bg-red-500 font-black py-4 rounded-xl text-xl shadow-lg transition mt-4 animate-pulse">
+          ستووووب! ✋🛑
+        </button>
+      </form>
+    </div>
+
+    <!-- 4. شاشة النتائج (Results) -->
+    <div id="resultsScreen" class="hidden space-y-6">
+      <div class="text-center">
+        <h2 class="text-3xl font-black text-emerald-400">نتائج الجولة 🏆</h2>
+        <p id="stoppedByMsg" class="text-sm text-slate-400 mt-1"></p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-right">
+          <thead class="bg-slate-700 text-slate-300">
+            <tr>
+              <th class="p-2">اللاعب</th>
+              <th class="p-2">إنسان</th>
+              <th class="p-2">حيوان</th>
+              <th class="p-2">نبات</th>
+              <th class="p-2">جماد</th>
+              <th class="p-2">بلاد</th>
+              <th class="p-2">نقاط الجولة</th>
+              <th class="p-2">المجموع</th>
+            </tr>
+          </thead>
+          <tbody id="resultsTableBody" class="divide-y divide-slate-700"></tbody>
+        </table>
+      </div>
+
+      <button id="nextRoundBtn" class="hidden w-full bg-indigo-600 hover:bg-indigo-500 font-bold py-3 rounded-xl shadow-lg transition">
+        الجولة التالية 🔄
+      </button>
+    </div>
+
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
+</body>
+</html>
